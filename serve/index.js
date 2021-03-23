@@ -1,69 +1,90 @@
-var officegen = require('officegen');
-var fs = require('fs');
-var path = require('path');
-var docx = officegen('docx');
-var async = require('async');
+const officegen = require('officegen')
+const fs = require('fs')
 
+// Create an empty Word object:
+let docx = officegen('docx')
 
-/**
- * 导出word
- */
-// exports.exportWord = function(req, res) {
-console.log('exportWord-------------');
-docx.on('finalize', function (written) {
-    console.log('Finish to create Word file.\nTotal bytes created: ' + written + '\n');
-});
+// Officegen calling this function after finishing to generate the docx document:
+docx.on('finalize', function(written) {
+  console.log(
+    'Finish to create a Microsoft Word document.'
+  )
+})
 
+// Officegen calling this function to report errors:
+docx.on('error', function(err) {
+  console.log(err)
+})
 
-docx.on('error', function (err) {
-    console.log(err);
-});
+// Create a new paragraph:
+let pObj = docx.createP()
 
+pObj.addText('Simple')
+pObj.addText(' with color', { color: '000088' })
+pObj.addText(' and back color.', { color: '00ffff', back: '000088' })
 
-var pObj = docx.createP({ align: 'center' });// 创建行 设置居中
-pObj.addText('血液透析（滤过）治疗知情同意书', { bold: true, font_face: 'Arial', font_size: 18 });// 添加文字 设置字体样式 加粗 大小
+pObj = docx.createP()
 
+pObj.addText('Since ')
+pObj.addText('officegen 0.2.12', {
+  back: '00ffff',
+  shdType: 'pct12',
+  shdColor: 'ff0000'
+}) // Use pattern in the background.
+pObj.addText(' you can do ')
+pObj.addText('more cool ', { highlight: true }) // Highlight!
+pObj.addText('stuff!', { highlight: 'darkGreen' }) // Different highlight color.
 
-var pObj = docx.createP();
-pObj.addText("测试哈哈");
-pObj.addText(' with color', { color: '000088' });// 设置字体颜色
-pObj.addText('性别');
-pObj.addText('', { color: '00ffff', back: '000088' });
-pObj.addText('年龄');
-pObj.addText('岁', { color: '000088' });
+pObj = docx.createP()
 
+pObj.addText('Even add ')
+pObj.addText('external link', { link: 'https://github.com' })
+pObj.addText('!')
 
-var pObj = docx.createP();
-pObj.addText('门诊（住院）号');
-pObj.addText(' with color', { color: '000088' });
-pObj.addText('诊断');
-pObj.addText('', { color: '000088' });
+pObj = docx.createP()
 
+pObj.addText('Bold + underline', { bold: true, underline: true })
 
-var pObj = docx.createP();
-pObj.addText('一、血液透析（滤过）能有效清除身体内过多的水分合霉素，是治疗急性和慢性肾衰竭等疾病的有效方法。');
-var pObj = docx.createP();
-pObj.addText('二、血液透析（滤过）治疗时，首先需要将患者血液引到体外，然后通过透析或滤过等方法清除水分和霉素，经受理后的血液再回到患者体外。');
-var pObj = docx.createP();
-pObj.addText('三、为了有效引出血液，治疗前需要建立血管通路（动静脉内痿或深静脉插管）。');
-var pObj = docx.createP();
-pObj.addText('四、为防止血液在体外管路和透析器发生凝固，一般需要在透析前和透析过程中注射肝素等抗凝药物。');
-var pObj = docx.createP();
-pObj.addText('五、血透过程中和治疗期间存在下列医疗风险，可能造成严重后果，甚至危及生命：');
-var pObj = docx.createP();
-pObj.addText('1.低血压，心力衰竭，心肌梗塞，心律失常，脑血管意外；');
-var pObj = docx.createP();
-pObj.addText('2.空气球栓塞；');
-var pObj = docx.createP();
-pObj.addText('我很帅的哈哈哈哈！我很帅！', { font_face: 'Symbol', font_size: 20 });
+pObj = docx.createP({ align: 'center' })
 
+pObj.addText('Center this text', {
+  border: 'dotted',
+  borderSize: 12,
+  borderColor: '88CCFF'
+})
 
+pObj = docx.createP()
+pObj.options.align = 'right'
 
+pObj.addText('Align this text to the right.')
 
-var out = fs.createWriteStream('out.docx');// 文件写入
-out.on('error', function (err) {
-    console.log(err);
-});
+pObj = docx.createP()
 
+pObj.addText('Those two lines are in the same paragraph,')
+pObj.addLineBreak()
+pObj.addText('but they are separated by a line break.')
 
-var result = docx.generate(out);// 服务端生成word
+docx.putPageBreak()
+
+pObj = docx.createP()
+
+pObj.addText('Fonts face only.', { font_face: 'Arial' })
+pObj.addText(' Fonts face and size.', { font_face: 'Arial', font_size: 40 })
+
+docx.putPageBreak()
+
+pObj = docx.createP()
+
+// We can even add images:
+pObj.addImage('pic.jpg')
+
+// Let's generate the Word document into a file:
+
+let out = fs.createWriteStream('example.docx')
+
+out.on('error', function(err) {
+  console.log(err)
+})
+
+// Async call to generate the output file:
+docx.generate(out)
