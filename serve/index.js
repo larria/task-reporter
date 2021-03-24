@@ -76,7 +76,7 @@ docx.putPageBreak()
 pObj = docx.createP()
 
 // We can even add images:
-pObj.addImage('pic.jpg')
+pObj.addImage('pic.jpg', {cx: 300, cy: 200})
 
 // Let's generate the Word document into a file:
 
